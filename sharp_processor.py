@@ -1,7 +1,5 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """
-SHARP 4D Video Processor using the SHARP CLI (In-Process).
+SHARP 4D Video Processor using the SHARP CLI.
 """
 
 import sys
