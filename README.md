@@ -1,8 +1,10 @@
-# SHARP 4D Video Plugin for LichtFeld Studio
+<div align="center">
 
-<p align="center">
-  <img src="assets/milo.gif" alt="SHARP 4D Video Plugin Demo" width="85%"/>
-</p>
+<h1>SHARP 4D Video Plugin for <a href="https://github.com/MrNeRF/LichtFeld-Studio">LichtFeld Studio</a></h1>
+
+<img src="assets/milo.gif" alt="SHARP 4D Video Plugin Demo" width="85%"/>
+
+</div>
 
 
 A 4D Gaussian Splatting plugin for LichtFeld Studio, powered by [SHARP](https://github.com/apple/ml-sharp). This tool enables the conversion of standard video files into 4D Gaussian Splat sequences and provides a dedicated player for 4D visualization within the LichtFeld environment.
@@ -11,7 +13,7 @@ A 4D Gaussian Splatting plugin for LichtFeld Studio, powered by [SHARP](https://
 
 - **Video-to-4DGS Conversion**: Automatically process video files into per-frame 3D Gaussian Splat (PLY) sequences using the SHARP model.
 - **Integrated Playback**: dedicated "Sharp 4D Video" side panel for loading and playing back 4D sequences.
-- **In-Process Inference**: Runs the SHARP inference pipeline directly within LichtFeld Studio's python environment (requires CUDA).
+- **In-Process Inference**: Runs the SHARP inference pipeline dir ectly within LichtFeld Studio's python environment (requires CUDA).
 
 ## Installation
 
