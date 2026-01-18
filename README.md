@@ -1,6 +1,6 @@
 # SHARP 4D Video Plugin for LichtFeld Studio
 
-A 4D Gaussian Splatting plugin for LichtFeld Studio, powered by [SHARP](https://github.com/Insufficiently-Funded/ml-sharp). This tool enables the conversion of standard video files into 4D Gaussian Splat sequences and provides a dedicated player for 4D visualization within the LichtFeld environment.
+A 4D Gaussian Splatting plugin for LichtFeld Studio, powered by [SHARP](https://github.com/apple/ml-sharp). This tool enables the conversion of standard video files into 4D Gaussian Splat sequences and provides a dedicated player for 4D visualization within the LichtFeld environment.
 
 ## Features
 
@@ -10,7 +10,8 @@ A 4D Gaussian Splatting plugin for LichtFeld Studio, powered by [SHARP](https://
 
 ## Installation
 
-### From GitHub (LichtFeld Studio 1.x+)
+### From GitHub (LichtFeld Studio v0.5+)
+
 
 In LichtFeld Studio:
 1. Open the **Plugins** panel.
@@ -25,7 +26,7 @@ In LichtFeld Studio:
    git clone https://github.com/shadygm/Lichtfeld-ml-sharp-Plugin.git
    ```
 2. Restart LichtFeld Studio.
-3. The plugin will automatically create a virtual environment and install dependencies (including `ml-sharp` requirements) upon first load or inspection.
+3. The plugin will automatically create a virtual environment and install all dependencies (including `ml-sharp` requirements) upon first load or inspection.
 
 ## Usage
 
@@ -51,7 +52,7 @@ Locate the **Sharp 4D Video** tab in the side panel area of LichtFeld Studio.
 
 ## Requirements
 
-- **LichtFeld Studio** (Version 1.0.0 or higher)
+- **LichtFeld Studio**
 - **NVIDIA GPU** with CUDA support (required for SHARP inference).
 - **FFmpeg** (usually handled by the plugin's dependencies).
 
@@ -60,7 +61,4 @@ Locate the **Sharp 4D Video** tab in the side panel area of LichtFeld Studio.
 This plugin integrates the **SHARP** (Spatio-temporal Hierarchical Auto-Regressive Point-clouds) architecture.
 
 - **Plugin Code**: Released under [GPL-3.0-or-later](LICENSE).
-- **SHARP Library**: Included as a submodule/vendor library in `ml-sharp`. Please refer to `ml-sharp/LICENSE` and `ml-sharp/LICENSE_MODEL` for specific usage rights regarding the model and inference code.
-
----
-**Note:** This plugin assumes the `ml-sharp` folder is present and populated. If you cloned without submodules, ensure `ml-sharp` contains the necessary source code.
+- **SHARP Library**: Included as a library in `ml-sharp`. Please refer to `ml-sharp/LICENSE` and `ml-sharp/LICENSE_MODEL` for specific usage rights regarding the model and inference code.

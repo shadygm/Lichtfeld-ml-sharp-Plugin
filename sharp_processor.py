@@ -8,11 +8,12 @@ import sys
 import os
 import shutil
 import tempfile
-from pathlib import Path
 import logging
 import numpy as np
 import imageio.v2 as imageio
 import imageio_ffmpeg
+import torch
+from pathlib import Path
 from tqdm import tqdm
 from unittest.mock import patch
 
@@ -22,10 +23,11 @@ _ML_SHARP_SRC = _THIS_DIR / "ml-sharp" / "src"
 if str(_ML_SHARP_SRC) not in sys.path:
     sys.path.insert(0, str(_ML_SHARP_SRC))
 
-# Import the CLI command directly
-from sharp.cli.predict import predict_cli
-from sharp.utils import logging as sharp_logging
-from sharp.utils.gaussians import load_ply
+# Import the CLI command and utilities directly
+from sharp.cli.predict import predict_image, DEFAULT_MODEL_URL
+from sharp.models import PredictorParams, create_predictor
+from sharp.utils import io
+from sharp.utils.gaussians import load_ply, save_ply
 from plyfile import PlyData
 
 # Force imageio to use the ffmpeg binary from the imageio-ffmpeg package
@@ -70,33 +72,41 @@ class SharpProcessor:
                 imageio.imsave(frame_path, frame)
             reader.close()
 
-            # 2. Run sharp predict CLI (In-Process)
-            self.logger.info("Running sharp predict CLI...")
-            if progress_callback:
-                progress_callback(0, 1, "Running SHARP Inference (this may take a while)...")
-
-            # Prepare arguments for click
-            # sharp predict -i <temp_dir> -o <output_dir>
-            # Note: predict_cli is the command function decorated with @click.command
+            # 2. Run SHARP Inference (In-Process)
+            self.logger.info("Running SHARP Inference...")
             
-            args = [
-                "-i", str(temp_dir),
-                "-o", str(output_dir),
-                "--device", "cuda" # explicit device preference
-            ]
+            image_paths = sorted(list(temp_dir.glob("*.jpg")))
+            total_frames = len(image_paths)
+            
+            if total_frames == 0:
+                raise RuntimeError(f"No frames found in {temp_dir}")
 
-            # Patch sharp.utils.logging.configure to avoid messing up LFS logging
-            # We just mock it to do nothing, or we could redirect it.
-            with patch('sharp.utils.logging.configure') as mock_log_conf:
-                try:
-                    # standalone_mode=False prevents click from calling sys.exit()
-                    predict_cli.main(args=args, standalone_mode=False, prog_name="sharp predict")
-                except SystemExit as e:
-                    if e.code != 0:
-                        raise RuntimeError(f"SHARP CLI exited with code {e.code}")
-                except Exception as e:
-                    self.logger.error(f"SHARP CLI failed: {e}")
-                    raise RuntimeError(f"SHARP CLI Error: {e}")
+            device = "cuda" if torch.cuda.is_available() else "cpu"
+            self.logger.info(f"Using device: {device}")
+
+            # Load model
+            if progress_callback:
+                progress_callback(0, total_frames, "Loading SHARP model...")
+            
+            state_dict = torch.hub.load_state_dict_from_url(DEFAULT_MODEL_URL, progress=False)
+            gaussian_predictor = create_predictor(PredictorParams())
+            gaussian_predictor.load_state_dict(state_dict)
+            gaussian_predictor.eval()
+            gaussian_predictor.to(device)
+
+            for i, image_path in enumerate(image_paths):
+                if progress_callback:
+                    progress_callback(i, total_frames, f"SHARP Inference: Processing frame {i+1}/{total_frames}")
+                
+                # Load image using SHARP's utility
+                image, _, f_px = io.load_rgb(image_path)
+                height, width = image.shape[:2]
+                
+                # Predict Gaussians
+                gaussians = predict_image(gaussian_predictor, image, f_px, torch.device(device))
+                
+                # Save as PLY
+                save_ply(gaussians, f_px, (height, width), output_dir / f"{image_path.stem}.ply")
 
             self.logger.info("SHARP Inference complete.")
             

@@ -6,7 +6,7 @@ name = "sharp_4d"
 version = "0.1.0"
 description = "4D Gaussian Splatting from Video using SHARP"
 author = "LichtFeld"
-min_lichtfeld_version = "1.0.0"
+min_lichtfeld_version = "0.0.5"
 
 [dependencies]
 packages = [
