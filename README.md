@@ -1,14 +1,12 @@
-# Dense Initialization Plugin for LichtFeld Studio
+# SHARP 4D Video Plugin for LichtFeld Studio
 
-A densification preprocessing plugin for COLMAP-based workflows in LichtFeld Studio. This tool performs densification pass on sparse COLMAP reconstructions to create dense point clouds, enabling faster downstream processing, model training, and higher quality.
-
-Based on bounty #2 ([link](https://github.com/MrNeRF/LichtFeld-Studio/pull/413)), with an upgrade to RoMaV2 for improved dense matching.
+A 4D Gaussian Splatting plugin for LichtFeld Studio, powered by [SHARP](https://github.com/Insufficiently-Funded/ml-sharp). This tool enables the conversion of standard video files into 4D Gaussian Splat sequences and provides a dedicated player for 4D visualization within the LichtFeld environment.
 
 ## Features
 
-- **RoMaV2 Matching**: Upgraded dense correspondence matching for better accuracy.
-- **GUI Panel**: Easy-to-use interface with progress tracking and scene import.
-- **CLI Support**: Run via `densify.py` with full argument control.
+- **Video-to-4DGS Conversion**: Automatically process video files into per-frame 3D Gaussian Splat (PLY) sequences using the SHARP model.
+- **Integrated Playback**: dedicated "Sharp 4D Video" side panel for loading and playing back 4D sequences.
+- **In-Process Inference**: Runs the SHARP inference pipeline directly within LichtFeld Studio's python environment (requires CUDA).
 
 ## Installation
 
@@ -16,72 +14,53 @@ Based on bounty #2 ([link](https://github.com/MrNeRF/LichtFeld-Studio/pull/413))
 
 In LichtFeld Studio:
 1. Open the **Plugins** panel.
-2. Enter: `https://github.com/shadygm/lichtfeld-densification-plugin`
+2. Enter: `https://github.com/shadygm/Lichtfeld-ml-sharp-Plugin`
 3. Click **Install**.
 
 ### Manual Installation
 
-```bash
-git clone https://github.com/shadygm/lichtfeld-densification-plugin.git ~/.lichtfeld/plugins/lichtfeld-densification-plugin
-```
+1. Clone this repository into your LichtFeld Studio plugins directory:
+   ```bash
+   cd ~/.lichtfeld/plugins
+   git clone https://github.com/shadygm/Lichtfeld-ml-sharp-Plugin.git
+   ```
+2. Restart LichtFeld Studio.
+3. The plugin will automatically create a virtual environment and install dependencies (including `ml-sharp` requirements) upon first load or inspection.
 
 ## Usage
 
-### GUI
+### 1. Open the Panel
+Locate the **Sharp 4D Video** tab in the side panel area of LichtFeld Studio.
 
-1. Open the **Dense Initialization** panel (side panel).
-2. Ensure a scene is loaded in LichtFeld Studio.
-3. Configure settings (e.g., RoMa quality, reference fraction, filtering thresholds).
-4. Click **Start Densification**.
-5. Monitor progress and click **Import to Scene** when complete.
+### 2. Processing a Video
+1. Check **Input is Video File**.
+2. Select your source video path using the file picker.
+3. Click **Process Video**.
+   - *Note: Processing can take significant time depending on video length and GPU power.*
+   - Progress is displayed in the panel.
+   - Output PLY files are saved in a folder named `<video_name>_gaussians` next to your input video.
 
-### Python API
+### 3. Playing a Sequence
+1. Once processing is complete (or if you have an existing sequence), uncheck **Input is Video File** (or it will auto-switch after processing).
+2. Ensure the path points to the directory containing the `.ply` sequence.
+3. Click **Load PLY Sequence**.
+4. Use the playback controls:
+   - **Play/Pause**: Toggle playback.
+   - **Frame Slider**: Scrub through the timeline.
+   - **FPS**: Adjust playback speed.
 
-```python
-from densify import dense_init, densify_scene, DenseSceneData
-from argparse import Namespace
-import lichtfeld as lf
+## Requirements
 
-# Example assuming running within LFS context
-if hasattr(lf, 'get_scene'):
-    scene = lf.get_scene()
-    # ... setup data and run densify_scene ...
-```
+- **LichtFeld Studio** (Version 1.0.0 or higher)
+- **NVIDIA GPU** with CUDA support (required for SHARP inference).
+- **FFmpeg** (usually handled by the plugin's dependencies).
 
-For asynchronous usage, use the panel's job system or extend with threading.
+## Credits & License
 
-## Configuration
+This plugin integrates the **SHARP** (Spatio-temporal Hierarchical Auto-Regressive Point-clouds) architecture.
 
-### RoMa Settings
+- **Plugin Code**: Released under [GPL-3.0-or-later](LICENSE).
+- **SHARP Library**: Included as a submodule/vendor library in `ml-sharp`. Please refer to `ml-sharp/LICENSE` and `ml-sharp/LICENSE_MODEL` for specific usage rights regarding the model and inference code.
 
-- `precise`: High quality, slow (H_lr=800, bidirectional).
-- `base`: Balanced (H_lr=640, no high-res).
-- `fast`: Default, fast (H_lr=512).
-- `turbo`: Fastest (H_lr=320).
-
-### Filtering Thresholds
-
-- **Certainty Thresh**: Min overlap certainty (0.0-1.0).
-- **Reproj Thresh**: Max reprojection error (px).
-- **Sampson Thresh**: Max Sampson error (px²).
-- **Min Parallax Deg**: Min parallax angle (deg).
-- **No Filter**: Disable all geometric checks for raw output.
-
-Adjust these in the GUI's Advanced Settings or via CLI flags.
-
-## Dependencies
-
-Automatically installed in the plugin's virtual environment:
-
-- `pycolmap>=0.6.0`
-- `romav2` (RoMaV2)
-- `Pillow`
-- `numpy`
-- `scipy`
-- `tqdm`
-
-## License
-
-This plugin's code is released under GPL-3.0-or-later (same as LichtFeld Studio).
-
-RoMa (matching model) and DINOv3 have their own licenses—review them separately for redistribution or commercial use.
+---
+**Note:** This plugin assumes the `ml-sharp` folder is present and populated. If you cloned without submodules, ensure `ml-sharp` contains the necessary source code.

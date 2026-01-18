@@ -1,0 +1,36 @@
+# Python / General
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.venv/
+.env
+
+# Jupyter Notebooks
+.ipynb_checkpoints
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Plugin Specific
+# Temporary extraction directories
+sharp_frames_*/
+
+# Output directories (if generated inside the repo)
+*_gaussians/
+
+# Project configuration (optional, depending on preference)
+# plugin.toml is usually tracked.
+
+# Logs
+*.log

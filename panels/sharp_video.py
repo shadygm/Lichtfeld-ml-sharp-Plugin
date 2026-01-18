@@ -226,12 +226,9 @@ class SharpVideoPanel:
         if not self.ply_files:
             return
 
-        path = Path(self.ply_files[idx])
         node_name = node_name or "Sharp4D"
+        path = Path(self.ply_files[idx])
 
-        # --------------------------------------------------
-        # 1. Load PLY FIRST
-        # --------------------------------------------------
         try:
             result = lf.io.load(str(path))
             splat = result.splat_data
@@ -241,17 +238,12 @@ class SharpVideoPanel:
             lf.log.error(f"Failed to load splat frame {path}: {e}")
             return
 
-        # --------------------------------------------------
-        # 2. Get scene (must already exist)
-        # --------------------------------------------------
         scene = lf.get_scene()
         if scene is None:
-            lf.log.error("Scene is None after lf.io.load — aborting")
+            lf.log.error("No active scene available.")
+            self.stage = Stage.ERROR
             return
 
-        # --------------------------------------------------
-        # 3. Add NEW node first (temporary unique name)
-        # --------------------------------------------------
         new_node_name = f"{node_name}__next"
 
         lf.log.info(f"Adding frame {idx+1}/{len(self.ply_files)}: {path}")
@@ -268,22 +260,15 @@ class SharpVideoPanel:
             scene_scale=splat.scene_scale,
         )
 
-        # --------------------------------------------------
-        # 4. Remove OLD node (if it exists)
-        # --------------------------------------------------
         old_node = scene.get_node(node_name)
         if old_node:
             scene.remove_node(old_node.name)
 
-        # --------------------------------------------------
-        # 5. Rename new node to canonical name
-        # --------------------------------------------------
         scene.rename_node(new_node_name, node_name)
-
-        # --------------------------------------------------
-        # 6. Notify renderer
-        # --------------------------------------------------
         scene.invalidate_cache()
+
+
+
 
 
 
